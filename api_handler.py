@@ -6,29 +6,33 @@ from openai import OpenAI
 client = OpenAI(
     # 若没有配置环境变量，请用阿里云百炼API Key将下行替换为：api_key="sk-xxx",
     # 各地域的API Key不同。获取API Key：https://help.aliyun.com/zh/model-studio/get-api-key
-    api_key=os.getenv("DASHSCOPE_API_KEY"),
+    #api_key=os.getenv("DASHSCOPE_API_KEY"),
+    api_key="sk-PIZ9WMKMz7nrF8qHdM49QMOq9bWd6XoezLU2ReSTzcXROIUe",
     # 以下为北京地域的 base_url，若使用弗吉尼亚地域模型，需要将base_url换成https://dashscope-us.aliyuncs.com/compatible-mode/v1
     # 若使用新加坡地域的模型，需将base_url替换为：https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    #
+    #base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    base_url="https://api.vectorengine.ai/v1",
 )
 
-ocr_prompt = """漫画OCR与数据标注专家任务：请对提供的漫画图片进行高精度的日文对话识别，并按照指定的数据结构输出。
-
-具体指令：
-1. 识别目标：请识别图片中所有的对话框（气泡）内的日文文本。
-2. 文本转录：严格保留原文的日文、断句、标点符号和语气词。不要进行翻译或修改。
-3. 坐标检测：检测每个文本区域的界定框（Bounding Box）。
-4. 坐标规则：坐标必须基于整张图片的宽高进行归一化处理（百分比），保留4位小数。
-5. 坐标定义：x1Ratio/y1Ratio 为界定框左上角，x2Ratio/y2Ratio 为界定框右下角。
-6. 元数据填充（严格按照此规则）：
-   - id: 生成一个当前时间的毫秒级时间戳作为唯一ID。
-   - pageNumber: 统一填写数字 0。
-   - textNumber: 按照识别顺序从 1 开始依次递增（如 1, 2, 3...）。
-   - transText: 留空字符串 ''。
-7. 输出规范：请严格输出以下 JSON 格式的数组，不要包含任何额外的解释、Markdown 代码块标记（如 ```json）或其他文本。
-
-输出格式示例：
-[
+ocr_prompt = """
+{
+"role": "漫画OCR与数据标注专家",
+"task": "请对提供的漫画图片进行高精度的日文对话识别，并按照指定的数据结构输出。",
+"instructions": [
+"1. 识别目标：请识别图片中每一个独立的对话框（气泡）内的日文文本。每个视觉上分离的气泡必须视为一个独立文本单元，即使内容语义连贯或位置相邻，也绝不合并。",
+"2. 文本转录：严格保留原文的日文、断句、标点符号和语气词。不要进行翻译、改写、拼接或跨气泡合并。",
+"3. 坐标检测：为每个独立气泡中的文本区域检测其界定框（Bounding Box）。确保每个气泡仅对应一个 bounding box 和一条 ocrText。",
+"4. 坐标规则：坐标必须基于整张图片的宽高进行归一化处理（百分比），保留4位小数。",
+"5. 坐标定义：x1Ratio/y1Ratio 为界定框左上角，x2Ratio/y2Ratio 为界定框右下角。",
+"6. 元数据填充（严格按照此规则）：",
+" - id: 生成一个当前时间的毫秒级时间戳作为唯一ID。",
+" - pageNumber: 统一填写数字 0。",
+" - textNumber: 按照漫画阅读顺序（从上到下、从右到左或从左到右，依日文排版习惯）对每个独立气泡依次编号，从 1 开始递增。",
+" - transText: 留空字符串 ''。",
+"7. 输出规范：请严格输出以下 JSON 格式的数组，不要包含任何额外的解释、Markdown 代码块标记（如 ```json）或其他文本。"
+],
+"output_schema": [
 {
 "id": 1770194763943,
 "pageNumber": 0,
@@ -40,9 +44,10 @@ ocr_prompt = """漫画OCR与数据标注专家任务：请对提供的漫画图�
 "ocrText": "以前話題になったパフォーマンスもだけどどこまで綿密に台本を組んでいるの?",
 "transText": ""
 }
-]
-
-注意事项：请确保识别结果的顺序与漫画阅读顺序（从上到下，从左到右）大致一致。"""
+],
+"notes": "请确保识别结果的顺序与漫画阅读顺序（从上到下，从左到右）大致一致。"
+}
+"""
 
 
 trans_promt = """
@@ -172,7 +177,7 @@ def translate_filtered_results(input_file="output/filtered_results.json", output
         
         # 发送翻译请求
         completion = client.chat.completions.create(
-            model="qwen3-vl-plus",  # 使用与OCR相同的模型，可根据需要调整
+            model="qwen3-max",  # 使用与OCR相同的模型，可根据需要调整
             messages=translation_request,
             timeout=120
         )
