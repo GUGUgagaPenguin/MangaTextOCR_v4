@@ -1,0 +1,28 @@
+# 忽略所有 .log 文件
+*.log
+
+# 忽略 node_modules 文件夹（前端必备）
+node_modules/
+
+# 忽略 Python 编译文件
+__pycache__/
+*.py[cod]
+
+# 忽略 macOS 的系统文件
+.DS_Store
+
+# 忽略本地配置文件（包含数据库密码、API Key 等敏感信息的）
+.env
+
+# 但不忽略这个特定的文件（即使它符合上面的过滤规则）
+!important.log
+
+# 忽略输入输出文件夹
+input/
+output/
+
+# 忽略虚拟环境文件夹
+venv/
+.venv/
+env/
+ENV/
