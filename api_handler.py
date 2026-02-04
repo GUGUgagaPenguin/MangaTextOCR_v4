@@ -14,8 +14,9 @@ client = OpenAI(
 )
 
 ocr_prompt = config['prompts']['ocr_prompt']
-
 trans_promt = config['prompts']['trans_prompt']
+ocr_model = config['api']['ocr_model']
+trans_model = config['api']['trans_model']
 
 # 将本地图片转换为base64编码
 def local_image_to_data_url(image_path):
@@ -44,7 +45,7 @@ def process_single_image(image_path):
         print(f"开始向API发送请求...")
         start_time = time.time()
         completion = client.chat.completions.create(
-            model="gemini-3-pro-preview", # 此处以qwen3-vl-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/models
+            model=ocr_model, # 此处以qwen3-vl-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/models
             messages=[
                 {
                     "role": "user",
@@ -105,7 +106,7 @@ def translate_filtered_results(input_file="output/filtered_results.json", output
         
         # 发送翻译请求
         completion = client.chat.completions.create(
-            model="gemini-3-pro-preview",  # 使用与OCR相同的模型，可根据需要调整
+            model=trans_model,  # 使用与OCR相同的模型，可根据需要调整
             messages=translation_request,
             timeout=120
         )

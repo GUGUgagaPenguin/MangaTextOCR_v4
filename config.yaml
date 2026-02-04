@@ -1,6 +1,8 @@
 api:
   key: "sk-PIZ9WMKMz7nrF8qHdM49QMOq9bWd6XoezLU2ReSTzcXROIUe"
   base_url: "https://api.vectorengine.ai/v1"
+  ocr_model: "gemini-3-pro-preview"
+  trans_model: "gemini-3-pro-preview"
 
 prompts:
   ocr_prompt: |
