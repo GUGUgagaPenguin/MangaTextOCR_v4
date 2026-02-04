@@ -13,13 +13,18 @@ __pycache__/
 
 # 忽略本地配置文件（包含数据库密码、API Key 等敏感信息的）
 .env
+config.yaml
 
 # 但不忽略这个特定的文件（即使它符合上面的过滤规则）
 !important.log
 
-# 忽略输入输出文件夹
-input/
-output/
+# 忽略输入输出文件夹中的内容，但保留空文件夹
+input/*
+output/*
+
+# 但允许添加空的input和output文件夹
+!input/
+!output/
 
 # 忽略虚拟环境文件夹
 venv/
