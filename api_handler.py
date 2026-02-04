@@ -64,7 +64,13 @@ def process_single_image(image_path):
         )
         end_time = time.time()
         print(f"API响应成功，耗时: {end_time - start_time:.2f}秒")
-        return completion.choices[0].message.content
+        
+        # 检查completion对象是否有效
+        if hasattr(completion, 'choices') and len(completion.choices) > 0:
+            return completion.choices[0].message.content
+        else:
+            print(f"API响应格式异常: {completion}")
+            return None
     except Exception as e:
         end_time = time.time()
         print(f"处理图片时发生错误 {image_path}: {str(e)} (耗时: {end_time - start_time:.2f}秒)")
@@ -112,7 +118,17 @@ def translate_filtered_results(input_file="output/filtered_results.json", output
         )
         
         # 解析API返回的翻译结果
-        response_text = completion.choices[0].message.content
+        if hasattr(completion, 'choices') and len(completion.choices) > 0:
+            response_text = completion.choices[0].message.content
+        else:
+            print(f"翻译API响应格式异常: {completion}")
+            # 如果解析失败，使用原始数据，但transText保持为空
+            translated_data = []
+            for item in data:
+                updated_item = item.copy()
+                updated_item['transText'] = ''
+                translated_data.append(updated_item)
+            return translated_data
         
         # 尝试解析返回的JSON
         try:

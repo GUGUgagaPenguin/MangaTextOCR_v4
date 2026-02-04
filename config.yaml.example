@@ -1,6 +1,8 @@
 api:
   key: "sk-GuguGagaGuguGagaGuguGagaGuguGagaGuguGagaGuguGagaGuguGaga"
   base_url: "https://api.GuGugaga.ai/v1"
+  ocr_model: "gemini-3-pro-preview"
+  trans_model: "gemini-3-pro-preview"
 
 prompts:
   ocr_prompt: |
